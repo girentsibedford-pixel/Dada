@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1f1e1b">
+  <title>Diapel Shoes — Walk your way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #24221f;
+      --muted: #77736c;
+      --ash: #efeee9;
+      --paper: #f8f7f3;
+      --brown: #795c43;
+      --brown-dark: #5b4331;
+      --line: #dedbd4;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: "DM Sans", sans-serif; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
+    .auth-screen { display: none; min-height: 100vh; grid-template-columns: 1fr 1fr; background: var(--ink); }
+    .auth-screen.active { display: grid; }
+    .auth-art { position: relative; display: flex; align-items: flex-end; min-height: 100vh; padding: 7vw; color: white; background: linear-gradient(0deg, rgba(24,22,20,.78), rgba(24,22,20,.02) 75%), url("https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1600&q=85") center/cover; }
+    .auth-art h1 { max-width: 520px; margin: 0; font: 700 clamp(2.8rem, 5vw, 5.6rem)/1.02 "Playfair Display", serif; }
+    .auth-art p { color: #e5e1db; font-size: 1rem; }
+    .auth-panel { display: flex; align-items: center; justify-content: center; padding: 48px 8%; background: var(--paper); }
+    .auth-box { width: min(100%, 420px); }
+    .brand-logo { font-weight: 700; letter-spacing: .16em; font-size: 1.15rem; text-transform: uppercase; }
+    .brand-logo span { color: var(--brown); }
+    .auth-box h2 { margin: 45px 0 8px; font: 700 2.5rem "Playfair Display", serif; }
+    .auth-box > p { color: var(--muted); margin: 0 0 30px; }
+    .field { display: block; margin: 18px 0; font-size: .88rem; font-weight: 600; }
+    .field input { display: block; width: 100%; margin-top: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 3px; background: white; outline-color: var(--brown); }
+    .button { display: inline-flex; justify-content: center; align-items: center; border: 1px solid var(--ink); padding: 13px 22px; background: var(--ink); color: white; text-decoration: none; font-weight: 600; transition: .2s; }
+    .button:hover { background: var(--brown); border-color: var(--brown); }
+    .button-light { color: var(--ink); background: transparent; }
+    .button-light:hover { color: white; }
+    .wide { width: 100%; margin-top: 10px; }
+    .auth-toggle { margin-top: 24px !important; text-align: center; }
+    .text-button { padding: 0; border: 0; background: none; color: var(--brown-dark); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    .auth-note { margin-top: 18px; color: var(--muted); font-size: .75rem; line-height: 1.6; }
+    header { position: sticky; z-index: 5; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 6vw; border-bottom: 1px solid rgba(36,34,31,.09); background: rgba(248,247,243,.94); backdrop-filter: blur(12px); }
+    .logo-link { color: var(--ink); text-decoration: none; }
+    nav { display: flex; align-items: center; gap: clamp(16px, 3vw, 38px); }
+    nav a, .nav-button { color: var(--ink); border: 0; background: none; text-decoration: none; font-size: .9rem; font-weight: 600; }
+    nav a:hover, .nav-button:hover { color: var(--brown); }
+    .user-label { color: var(--muted); font-size: .86rem; }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 570px; background: var(--ash); }
+    .hero-copy { align-self: center; padding: 8vw 7vw; }
+    .eyebrow { color: var(--brown); font-size: .75rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1, h2, h3, p { overflow-wrap: anywhere; }
+    .hero h1 { max-width: 600px; margin: 18px 0; font: 700 clamp(3rem, 6.6vw, 6.6rem)/.98 "Playfair Display", serif; letter-spacing: -.04em; }
+    .hero-copy > p { max-width: 460px; margin: 20px 0 28px; color: #5f5b54; line-height: 1.8; }
+    .hero-image { min-height: 430px; background: url("https://images.unsplash.com/photo-1495555961986-6d4c1ecb7be3?auto=format&fit=crop&w=1400&q=85") center/cover; }
+    .section { padding: 84px 6vw; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 30px; }
+    .section-heading h2, .about-copy h2 { margin: 8px 0 0; font: 700 clamp(2rem, 4vw, 3.4rem)/1.1 "Playfair Display", serif; }
+    .section-heading p { max-width: 410px; margin: 0; color: var(--muted); line-height: 1.7; }
+    .feature-grid, .brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feature-card { position: relative; display: flex; min-height: 300px; align-items: end; padding: 26px; overflow: hidden; color: white; text-decoration: none; background-position: center; background-size: cover; }
+    .feature-card::before { position: absolute; inset: 0; content: ""; background: linear-gradient(0deg, rgba(22,20,18,.72), transparent 78%); transition: .3s; }
+    .feature-card:hover::before { background-color: rgba(22,20,18,.12); }
+    .feature-card span { z-index: 1; font: 700 1.8rem "Playfair Display", serif; }
+    .about { display: grid; grid-template-columns: .9fr 1.1fr; gap: 8vw; align-items: center; background: var(--ash); }
+    .about-image { min-height: 390px; background: url("https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=1200&q=85") center/cover; }
+    .about-copy p { max-width: 620px; color: #625e57; line-height: 1.85; }
+    .collection-top { padding: 62px 6vw 30px; background: var(--ash); }
+    .breadcrumbs { display: flex; gap: 9px; margin-bottom: 18px; color: var(--muted); font-size: .83rem; }
+    .breadcrumbs button { padding: 0; border: 0; background: none; color: inherit; text-decoration: underline; }
+    .collection-top h1 { margin: 0; font: 700 clamp(2.7rem, 5vw, 4.8rem)/1.05 "Playfair Display", serif; }
+    .collection-top p { max-width: 660px; color: #625e57; line-height: 1.7; }
+    .shop-layout { display: grid; grid-template-columns: 215px 1fr; gap: 38px; padding: 42px 6vw 85px; }
+    .filters { padding-right: 24px; border-right: 1px solid var(--line); }
+    .filters h3 { margin: 0 0 20px; font-size: 1rem; }
+    .filter-group { margin: 0 0 25px; }
+    .filter-group h4 { margin: 0 0 12px; font-size: .83rem; letter-spacing: .05em; text-transform: uppercase; }
+    .category-list { display: grid; gap: 11px; }
+    .category-button { padding: 0; border: 0; background: none; color: var(--muted); text-align: left; }
+    .category-button.active, .category-button:hover { color: var(--brown-dark); font-weight: 700; }
+    .filter-group select, .price-inputs input { width: 100%; min-height: 41px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 2px; background: white; color: var(--ink); }
+    .price-inputs { display: flex; gap: 8px; }
+    .price-inputs input { min-width: 0; }
+    .apply-price { width: 100%; margin-top: 8px; padding: 9px; border: 1px solid var(--ink); background: transparent; font-size: .84rem; font-weight: 600; }
+    .results-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; color: var(--muted); font-size: .87rem; }
+    .results-top select { padding: 10px; border: 1px solid var(--line); background: white; color: var(--ink); }
+    .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 17px; }
+    .product-image { position: relative; display: block; width: 100%; aspect-ratio: 4/4.5; overflow: hidden; background: #e8e6e0; }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+    .product-card:hover .product-image img { transform: scale(1.04); }
+    .product-tag { position: absolute; top: 12px; left: 12px; padding: 6px 9px; background: var(--paper); color: var(--ink); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .product-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: .86rem; }
+    .product-meta span:last-child { font-weight: 700; white-space: nowrap; }
+    .product-category { margin: 5px 0 0; color: var(--muted); font-size: .79rem; }
+    .empty-state { grid-column: 1/-1; padding: 50px 20px; color: var(--muted); text-align: center; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 30px 6vw; background: var(--ink); color: #dedbd4; font-size: .82rem; }
+    footer a { color: white; }
+    @media (max-width: 800px) {
+      .auth-screen.active { grid-template-columns: 1fr; }
+      .auth-art { display: none; }
+      .auth-panel { min-height: 100vh; padding: 42px 8%; }
+      header { padding: 15px 5vw; }
+      nav { gap: 14px; }
+      nav a, .nav-button, .user-label { font-size: .78rem; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-copy { padding: 70px 7vw; }
+      .hero-image { min-height: 370px; }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+      .about { grid-template-columns: 1fr; }
+      .about-image { min-height: 310px; }
+      .shop-layout { grid-template-columns: 175px 1fr; gap: 22px; padding-right: 4vw; padding-left: 4vw; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 540px) {
+      header { flex-wrap: wrap; }
+      nav { width: 100%; justify-content: space-between; }
+      .user-label { display: none; }
+      .section { padding: 60px 6vw; }
+      .section-heading { align-items: start; flex-direction: column; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 250px; }
+      .shop-layout { grid-template-columns: 1fr; }
+      .filters { padding: 0 0 20px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .category-list { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+      .results-top { align-items: flex-start; flex-direction: column; }
+      .results-top select { width: 100%; }
+      footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main id="authScreen" class="auth-screen active">
+    <div class="auth-art">
+      <div>
+        <h1>Find your pace. Find your pair.</h1>
+        <p>Good shoes take you good places.</p>
+      </div>
+    </div>
+    <section class="auth-panel">
+      <div class="auth-box">
+        <a class="logo-link brand-logo" href="#" aria-label="Diapel Shoes home">DIAPEL <span>SHOES</span></a>
+        <h2 id="authTitle">Welcome back</h2>
+        <p id="authDescription">Sign in to discover your next favorite pair.</p>
+        <form id="authForm">
+          <label id="nameField" class="field" hidden>Your name
+            <input id="customerName" type="text" autocomplete="name" placeholder="e.g. Alex Morgan">
+          </label>
+          <label class="field">Email address
+            <input id="customerEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </label>
+          <label class="field">Password
+            <input type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+          </label>
+          <button class="button wide" id="authSubmit" type="submit">Sign in</button>
+        </form>
+        <p class="auth-toggle"><span id="toggleText">New to Diapel?</span> <button class="text-button" id="toggleAuth" type="button">Create an account</button></p>
+        <p class="auth-note">This storefront demo keeps your details only in this browser session. It does not create a real account or process payments.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="storeScreen" class="screen">
+    <header>
+      <a class="logo-link brand-logo" href="#" data-page="home">DIAPEL <span>SHOES</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#" data-page="home">Our story</a>
+        <a href="#" data-page="shop">Shop now</a>
+        <span class="user-label" id="userLabel"></span>
+        <button class="nav-button" id="logoutButton" type="button">Sign out</button>
+      </nav>
+    </header>
+
+    <section id="homePage" class="page">
+      <div class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">Made for every day</span>
+          <h1>Walk your way.</h1>
+          <p>Meet the shoes, socks, and everyday essentials that make every step feel like your own. Thoughtful picks, timeless style, and comfort that goes wherever you do.</p>
+          <button class="button" data-page="shop">Explore the collection&nbsp; →</button>
+        </div>
+        <div class="hero-image" role="img" aria-label="Classic sneaker in a warm neutral setting"></div>
+      </div>
+      <section class="section">
+        <div class="section-heading">
+          <div><span class="eyebrow">A good place to start</span><h2>Find your kind of comfort.</h2></div>
+          <p>From everyday icons to new-season favorites, explore collections chosen to help you move with confidence.</p>
+        </div>
+        <div class="feature-grid" id="homeCategories"></div>
+      </section>
+      <section class="section about" id="about">
+        <div class="about-image" role="img" aria-label="Everyday shoes ready for the journey"></div>
+        <div class="about-copy">
+          <span class="eyebrow">A little about us</span>
+          <h2>Good shoes. Better journeys.</h2>
+          <p>Diapel Shoes is a home for the pairs you reach for every day. We bring together familiar brands, easy-to-wear styles, and small essentials like socks so finding your next favorite feels simple.</p>
+          <p>Our purpose is to help everyone find comfort and confidence in every step — whether it is a slow Sunday, a busy commute, or a brand-new adventure.</p>
+          <button class="button" data-page="shop">Shop the edit&nbsp; →</button>
+        </div>
+      </section>
+      <footer><span>© 2026 Diapel Shoes</span><span>Comfort for every step.</span></footer>
+    </section>
+
+    <section id="shopPage" class="page" hidden>
+      <div class="collection-top">
+        <div class="breadcrumbs"><button data-page="home">Home</button><span>/</span><span>Shop</span></div>
+        <span class="eyebrow">The Diapel edit</span>
+        <h1>Shop all collections.</h1>
+        <p>Discover standout sneakers, timeless classics, fresh arrivals, and the finishing touches to go with them.</p>
+      </div>
+      <section class="section" style="padding-top: 35px">
+        <div class="section-heading">
+          <div><span class="eyebrow">Browse by collection</span><h2>Choose your next pair.</h2></div>
+          <p>Pick a collection to see its styles, categories, and prices.</p>
+        </div>
+        <div class="brand-grid" id="brandGrid"></div>
+      </section>
+      <footer><span>© 2026 Diapel Shoes</span><span>Comfort for every step.</span></footer>
+    </section>
+
+    <section id="collectionPage" class="page" hidden>
+      <div class="collection-top">
+        <div class="breadcrumbs"><button data-page="home">Home</button><span>/</span><button data-page="shop">Shop</button><span>/</span><span id="crumbCollection"></span></div>
+        <span class="eyebrow">Explore the collection</span>
+        <h1 id="collectionTitle"></h1>
+        <p id="collectionDescription"></p>
+      </div>
+      <div class="shop-layout">
+        <aside class="filters" aria-label="Product filters">
+          <h3>Filter &amp; sort</h3>
+          <div class="filter-group"><h4>Category</h4><div class="category-list" id="categoryList"></div></div>
+          <div class="filter-group">
+            <h4>Price range</h4>
+            <div class="price-inputs">
+              <input id="minPrice" type="number" min="0" placeholder="Min $" aria-label="Minimum price">
+              <input id="maxPrice" type="number" min="0" placeholder="Max $" aria-label="Maximum price">
+            </div>
+            <button class="apply-price" id="applyPrice" type="button">Apply price</button>
+          </div>
+          <button class="text-button" id="clearFilters" type="button">Clear filters</button>
+        </aside>
+        <div>
+          <div class="results-top"><span id="resultCount"></span><label>Sort by&nbsp;
+            <select id="sortSelect" aria-label="Sort products">
+              <option value="featured">Featured</option>
+              <option value="low-high">Price: low to high</option>
+              <option value="high-low">Price: high to low</option>
+              <option value="name">Name: A to Z</option>
+            </select>
+          </label></div>
+          <div class="product-grid" id="productGrid"></div>
+        </div>
+      </div>
+      <footer><span>© 2026 Diapel Shoes</span><span>Comfort for every step.</span></footer>
+    </section>
+  </div>
+
+  <script>
+    const collections = [
+      { id: "nike", name: "Nike", description: "Shop Nike sneakers, flats, easy-wear shoes, boots, and matching socks.", image: "photo-1542291026-7eec264c27ff" },
+      { id: "adidas", name: "Adidas", description: "Shop Adidas sneakers, flats, easy-wear shoes, boots, and matching socks.", image: "photo-1525966222134-fcfa99b8ae77" },
+      { id: "puma", name: "Puma", description: "Shop Puma sneakers, flats, easy-wear shoes, boots, and matching socks.", image: "photo-1608231387042-66d1773070a5" },
+      { id: "new-balance", name: "New Balance", description: "Shop New Balance sneakers, flats, easy-wear shoes, boots, and matching socks.", image: "photo-1551107696-a4b0c5a0d9a2" },
+      { id: "converse", name: "Converse", description: "Shop Converse sneakers, flats, easy-wear shoes, boots, and matching socks.", image: "photo-1587563871167-1ee9c731aefb" },
+      { id: "vans", name: "Vans", description: "Shop Vans sneakers, flats, easy-wear shoes, boots, and matching socks.", image: "photo-1720604083961-88336789791e" },
+      { id: "socks", name: "Socks", description: "The soft, dependable essentials that make every pair feel even better.", image: "photo-1586350977771-b3b0abd50c82" },
+      { id: "new-arrivals", name: "New arrivals", description: "Fresh finds and new-season styles, just added to the Diapel edit.", image: "photo-1552346154-21d32810aba3" }
+    ];
+
+    const products = [
+      { name: "Air Motion Runner", brand: "nike", category: "Running", price: 115, tag: "Bestseller", image: "photo-1542291026-7eec264c27ff" },
+      { name: "Court Classic Low", brand: "nike", category: "Lifestyle", price: 90, tag: "", image: "photo-1552346154-21d32810aba3" },
+      { name: "Everyday Flyknit", brand: "nike", category: "Running", price: 135, tag: "New", image: "photo-1495555961986-6d4c1ecb7be3" },
+      { name: "Air Street Essential", brand: "nike", category: "Lifestyle", price: 105, tag: "", image: "photo-1460353581641-37baddab0fa2" },
+      { name: "Campus Street", brand: "adidas", category: "Lifestyle", price: 100, tag: "Popular", image: "photo-1525966222134-fcfa99b8ae77" },
+      { name: "Cloudfoam Walk", brand: "adidas", category: "Running", price: 75, tag: "", image: "photo-1552346154-21d32810aba3" },
+      { name: "Retro Court 80", brand: "adidas", category: "Lifestyle", price: 85, tag: "", image: "photo-1495555961986-6d4c1ecb7be3" },
+      { name: "Run Comfort 2.0", brand: "adidas", category: "Running", price: 110, tag: "New", image: "photo-1549298916-b41d501d3772" },
+      { name: "Suede Street", brand: "puma", category: "Lifestyle", price: 80, tag: "Classic", image: "photo-1525966222134-fcfa99b8ae77" },
+      { name: "Velocity Lite", brand: "puma", category: "Running", price: 95, tag: "New", image: "photo-1542291026-7eec264c27ff" },
+      { name: "Court Rider", brand: "puma", category: "Lifestyle", price: 105, tag: "", image: "photo-1552346154-21d32810aba3" },
+      { name: "Pacer Street Low", brand: "puma", category: "Lifestyle", price: 88, tag: "", image: "photo-1600185365483-26d7a4cc7519" },
+      { name: "574 Core", brand: "new-balance", category: "Lifestyle", price: 110, tag: "Bestseller", image: "photo-1495555961986-6d4c1ecb7be3" },
+      { name: "Fresh Foam Pace", brand: "new-balance", category: "Running", price: 130, tag: "New", image: "photo-1542291026-7eec264c27ff" },
+      { name: "Classic 327", brand: "new-balance", category: "Lifestyle", price: 120, tag: "", image: "photo-1552346154-21d32810aba3" },
+      { name: "Everyday 515", brand: "new-balance", category: "Lifestyle", price: 100, tag: "", image: "photo-1608231387042-66d1773070a5" },
+      { name: "Canvas High Top", brand: "converse", category: "High tops", price: 70, tag: "Classic", image: "photo-1525966222134-fcfa99b8ae77" },
+      { name: "Canvas Low Top", brand: "converse", category: "Low tops", price: 65, tag: "", image: "photo-1460353581641-37baddab0fa2" },
+      { name: "Chuck Street Hi", brand: "converse", category: "High tops", price: 78, tag: "New", image: "photo-1600185365483-26d7a4cc7519" },
+      { name: "Old School Classic", brand: "vans", category: "Skate shoes", price: 72, tag: "Classic", image: "photo-1552346154-21d32810aba3" },
+      { name: "Canvas Slip-On", brand: "vans", category: "Slip-ons", price: 60, tag: "", image: "photo-1525966222134-fcfa99b8ae77" },
+      { name: "Skate Low Pro", brand: "vans", category: "Skate shoes", price: 82, tag: "New", image: "photo-1608231387042-66d1773070a5" },
+      { name: "Everyday Crew 3-Pack", brand: "socks", category: "Crew socks", price: 18, tag: "3-pack", image: "photo-1586350977771-b3b0abd50c82" },
+      { name: "Cushioned Ankle 3-Pack", brand: "socks", category: "Ankle socks", price: 16, tag: "", image: "photo-1582966772680-860e372bb558" },
+      { name: "Ribbed Everyday Crew", brand: "socks", category: "Crew socks", price: 12, tag: "New", image: "photo-1618354691373-d851c5c3a990" },
+      { name: "Sport Quarter 3-Pack", brand: "socks", category: "Quarter socks", price: 15, tag: "", image: "photo-1586350977771-b3b0abd50c82" },
+      { name: "Soft Lounge Socks", brand: "socks", category: "Crew socks", price: 14, tag: "Soft feel", image: "photo-1582966772680-860e372bb558" }
+    ];
+
+    const brandAssortments = [
+      { id: "nike", name: "Nike", images: ["photo-1542291026-7eec264c27ff", "photo-1587563871167-1ee9c731aefb", "photo-1460353581641-37baddab0fa2"] },
+      { id: "adidas", name: "Adidas", images: ["photo-1525966222134-fcfa99b8ae77", "photo-1552346154-21d32810aba3", "photo-1551107696-a4b0c5a0d9a2"] },
+      { id: "puma", name: "Puma", images: ["photo-1608231387042-66d1773070a5", "photo-1600185365483-26d7a4cc7519", "photo-1495555961986-6d4c1ecb7be3"] },
+      { id: "new-balance", name: "New Balance", images: ["photo-1551107696-a4b0c5a0d9a2", "photo-1549298916-b41d501d3772", "photo-1720604083961-88336789791e"] },
+      { id: "converse", name: "Converse", images: ["photo-1587563871167-1ee9c731aefb", "photo-1525966222134-fcfa99b8ae77", "photo-1605733160314-4fc7dac4bb16"] },
+      { id: "vans", name: "Vans", images: ["photo-1720604083961-88336789791e", "photo-1600185365483-26d7a4cc7519", "photo-1605733160314-4fc7dac4bb16"] }
+    ];
+    const shoeStyles = [
+      { name: "Everyday Flat", category: "Flat shoes", price: 68 },
+      { name: "Easy Wear Slip-On", category: "Easy wear", price: 74 },
+      { name: "City Walk Boot", category: "Boots", price: 118 }
+    ];
+    brandAssortments.forEach((brand, brandIndex) => {
+      shoeStyles.forEach((style, styleIndex) => {
+        products.push({
+          name: `${brand.name} ${style.name}`,
+          brand: brand.id,
+          category: style.category,
+          price: style.price + brandIndex * 3,
+          tag: styleIndex === 1 ? "Easy wear" : "",
+          image: brand.images[styleIndex]
+        });
+      });
+      products.push(
+        { name: `${brand.name} Everyday Crew Socks`, brand: brand.id, category: "Crew socks", price: 14 + brandIndex, tag: "Brand socks", image: "photo-1586350977771-b3b0abd50c82" },
+        { name: `${brand.name} Sport Ankle Socks`, brand: brand.id, category: "Ankle socks", price: 12 + brandIndex, tag: "Brand socks", image: "photo-1582966772680-860e372bb558" }
+      );
+      const brandProductsWithAdditions = products.filter((product) => product.brand === brand.id);
+      brandProductsWithAdditions.forEach((product, productIndex) => {
+        if (!product.name.toLowerCase().startsWith(brand.name.toLowerCase())) {
+          product.name = `${brand.name} ${product.name}`;
+        }
+        if (product.category !== "Crew socks" && product.category !== "Ankle socks") {
+          product.image = product.category === "Boots"
+            ? "photo-1605733160314-4fc7dac4bb16"
+            : brand.images[productIndex % brand.images.length];
+        }
+      });
+    });
+
+    const photo = (id, width = 800) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=80`;
+    const authScreen = document.getElementById("authScreen");
+    const storeScreen = document.getElementById("storeScreen");
+    const authForm = document.getElementById("authForm");
+    let isSignup = false;
+    let activeCollection = "";
+    let activeCategory = "All";
+    let priceLimit = { min: 0, max: Infinity };
+
+    function setAuthMode(signup) {
+      isSignup = signup;
+      document.getElementById("nameField").hidden = !signup;
+      document.getElementById("customerName").required = signup;
+      document.getElementById("customerName").autocomplete = signup ? "name" : "off";
+      document.getElementById("authTitle").textContent = signup ? "Create your account" : "Welcome back";
+      document.getElementById("authDescription").textContent = signup ? "Join us and find your next favorite pair." : "Sign in to discover your next favorite pair.";
+      document.getElementById("authSubmit").textContent = signup ? "Create account" : "Sign in";
+      document.getElementById("toggleText").textContent = signup ? "Already have an account?" : "New to Diapel?";
+      document.getElementById("toggleAuth").textContent = signup ? "Sign in" : "Create an account";
+    }
+
+    document.getElementById("toggleAuth").addEventListener("click", () => setAuthMode(!isSignup));
+    authForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = document.getElementById("customerName").value.trim();
+      const email = document.getElementById("customerEmail").value.trim();
+      document.getElementById("userLabel").textContent = name || email.split("@")[0];
+      authScreen.classList.remove("active");
+      storeScreen.classList.add("active");
+      showPage("home");
+    });
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      storeScreen.classList.remove("active");
+      authScreen.classList.add("active");
+      authForm.reset();
+      setAuthMode(false);
+    });
+
+    function showPage(page) {
+      document.querySelectorAll(".page").forEach((element) => { element.hidden = true; });
+      const target = page === "collection" ? "collectionPage" : `${page}Page`;
+      document.getElementById(target).hidden = false;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function collectionCard(collection, feature = false) {
+      const element = document.createElement("a");
+      element.className = feature ? "feature-card" : "feature-card";
+      element.href = "#";
+      element.style.backgroundImage = `url("${photo(collection.image, 1000)}")`;
+      element.innerHTML = `<span>${collection.name} <small aria-hidden="true">↗</small></span>`;
+      element.addEventListener("click", (event) => {
+        event.preventDefault();
+        openCollection(collection.id);
+      });
+      return element;
+    }
+
+    function initCollectionCards() {
+      const home = document.getElementById("homeCategories");
+      const brands = document.getElementById("brandGrid");
+      collections.forEach((item, index) => {
+        const card = collectionCard(item, index < 3);
+        if (index < 3) home.appendChild(card);
+        brands.appendChild(card.cloneNode(true));
+      });
+      brands.querySelectorAll(".feature-card").forEach((card, index) => {
+        card.addEventListener("click", (event) => {
+          event.preventDefault();
+          openCollection(collections[index].id);
+        });
+      });
+    }
+
+    function openCollection(id) {
+      activeCollection = id;
+      activeCategory = "All";
+      priceLimit = { min: 0, max: Infinity };
+      document.getElementById("minPrice").value = "";
+      document.getElementById("maxPrice").value = "";
+      document.getElementById("sortSelect").value = "featured";
+      const collection = collections.find((item) => item.id === id);
+      document.getElementById("crumbCollection").textContent = collection.name;
+      document.getElementById("collectionTitle").textContent = collection.name;
+      document.getElementById("collectionDescription").textContent = collection.description;
+      renderCategories();
+      renderProducts();
+      showPage("collection");
+    }
+
+    function getCollectionProducts(collectionId) {
+      if (collectionId === "new-arrivals") return products.filter((item) => item.tag === "New");
+      if (collectionId === "socks") return products.filter((item) => item.brand === "socks");
+      return products.filter((item) => item.brand === collectionId);
+    }
+
+    function renderCategories() {
+      const categories = ["All", ...new Set(getCollectionProducts(activeCollection).map((item) => item.category))];
+      const list = document.getElementById("categoryList");
+      list.replaceChildren();
+      categories.forEach((category) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `category-button${category === activeCategory ? " active" : ""}`;
+        button.textContent = category;
+        button.addEventListener("click", () => {
+          activeCategory = category;
+          renderCategories();
+          renderProducts();
+        });
+        list.appendChild(button);
+      });
+    }
+
+    function renderProducts() {
+      const collectionItems = getCollectionProducts(activeCollection);
+      let visible = collectionItems.filter((item) =>
+        (activeCategory === "All" || item.category === activeCategory) &&
+        item.price >= priceLimit.min && item.price <= priceLimit.max
+      );
+      const sort = document.getElementById("sortSelect").value;
+      if (sort === "low-high") visible = visible.sort((a, b) => a.price - b.price);
+      if (sort === "high-low") visible = visible.sort((a, b) => b.price - a.price);
+      if (sort === "name") visible = visible.sort((a, b) => a.name.localeCompare(b.name));
+      document.getElementById("resultCount").textContent = `${visible.length} ${visible.length === 1 ? "style" : "styles"}`;
+      const grid = document.getElementById("productGrid");
+      grid.replaceChildren();
+      if (!visible.length) {
+        grid.innerHTML = '<div class="empty-state">No styles match those filters. Try another category or price range.</div>';
+        return;
+      }
+      visible.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+        card.innerHTML = `<div class="product-image"><img src="${photo(item.image)}" alt="${item.name}" loading="lazy">${item.tag ? `<span class="product-tag">${item.tag}</span>` : ""}</div><div class="product-meta"><span>${item.name}</span><span>$${item.price.toFixed(2)}</span></div><p class="product-category">${item.category}</p>`;
+        grid.appendChild(card);
+      });
+    }
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-page]");
+      if (!button) return;
+      event.preventDefault();
+      showPage(button.dataset.page);
+    });
+    document.getElementById("sortSelect").addEventListener("change", renderProducts);
+    document.getElementById("applyPrice").addEventListener("click", () => {
+      const min = document.getElementById("minPrice").value;
+      const max = document.getElementById("maxPrice").value;
+      if (min && max && Number(min) > Number(max)) {
+        document.getElementById("maxPrice").setCustomValidity("Maximum price must be greater than minimum price.");
+        document.getElementById("maxPrice").reportValidity();
+        document.getElementById("maxPrice").setCustomValidity("");
+        return;
+      }
+      priceLimit = { min: min ? Number(min) : 0, max: max ? Number(max) : Infinity };
+      renderProducts();
+    });
+    document.getElementById("clearFilters").addEventListener("click", () => {
+      activeCategory = "All";
+      priceLimit = { min: 0, max: Infinity };
+      document.getElementById("minPrice").value = "";
+      document.getElementById("maxPrice").value = "";
+      renderCategories();
+      renderProducts();
+    });
+
+    initCollectionCards();
+  </script>
+</body>
+</html>
